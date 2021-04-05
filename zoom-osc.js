@@ -517,6 +517,13 @@ var allInstanceActions=[];
 						},
 						{
 							type:'dropdown',
+							label:'Group or Except Macro',
+							id:'groupMacro',
+							choices:ZOSC.groupMacros,
+							default:ZOSC.groupMacros[0].id
+						},
+						{
+							type:'dropdown',
 							label:'User',
 							id:'user',
 							choices:this.userList,
@@ -709,8 +716,6 @@ instance.prototype.action = function(action) {
 				userString = action.options.user;
 				break;
 }
-
-
 	var thisGroup=ZOSC.actions[action.action];
 	var thisMsg=thisGroup.MESSAGES[action.options.message];
 	// /zoom/[TARGET_TYPE]/[message]
@@ -753,7 +758,7 @@ instance.prototype.action = function(action) {
 if('USER_ACTION' in thisMsg && action.user!=ZOSC.keywords.ZOSC_MSG_PART_ME ){
 	var targetType = TARGET_TYPE;
 	if (targetType == "listIndex") targetType = ZOSC.keywords.ZOSC_MSG_TARGET_PART_ZOOMID;
-	path=	'/'+ZOSC.keywords.ZOSC_MSG_PART_ZOOM+'/'+targetType+'/'+thisMsg.USER_ACTION;
+		path=	'/'+ZOSC.keywords.ZOSC_MSG_PART_ZOOM+'/'+targetType+'/'+thisMsg.USER_ACTION;
 		//make user
 	if(TARGET_TYPE==ZOSC.keywords.ZOSC_MSG_TARGET_PART_GALINDEX||TARGET_TYPE==ZOSC.keywords.ZOSC_MSG_TARGET_PART_TARGET||TARGET_TYPE==ZOSC.keywords.ZOSC_MSG_TARGET_PART_ZOOMID||TARGET_TYPE == "listIndex"){
 		args.push({type:'i',value:parseInt(userString)});

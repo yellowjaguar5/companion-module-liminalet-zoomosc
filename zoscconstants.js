@@ -242,6 +242,18 @@ var keywords = {
 }
 ;
 
+var groupMacros ={
+ ZOSC_MSG_GROUP_PART_ALL  : {id:keywords.ZOSC_MSG_GROUP_PART_ALL , label: "All"},
+ ZOSC_MSG_GROUP_PART_TRACKED  : {id:keywords.ZOSC_MSG_GROUP_PART_TRACKED , label: "Tracked"},
+ ZOSC_MSG_GROUP_PART_PANELISTS  : {id:keywords.ZOSC_MSG_GROUP_PART_PANELISTS , label: "Panelists"},
+ ZOSC_MSG_GROUP_PART_ATTENDEES  : {id:keywords.ZOSC_MSG_GROUP_PART_ATTENDEES , label: "Attendees"},
+
+ ZOSC_MSG_EXCLUDE_PART_ALL_EXCEPT  : {id:keywords.ZOSC_MSG_EXCLUDE_PART_ALL_EXCEPT , label: "All Except"},
+ ZOSC_MSG_EXCLUDE_PART_TRACKED_EXCEPT  : {id:keywords.ZOSC_MSG_EXCLUDE_PART_TRACKED_EXCEPT , label: "Tracked Except"},
+ ZOSC_MSG_EXCLUDE_PART_PANELISTS_EXCEPT  : {id:keywords.ZOSC_MSG_EXCLUDE_PART_PANELISTS_EXCEPT , label: "Panelists Except"},
+ ZOSC_MSG_EXCLUDE_PART_ATTENDEES_EXCEPT  : {id:keywords.ZOSC_MSG_EXCLUDE_PART_ATTENDEES_EXCEPT , label: "Attendees Except"},
+};
+
 var actions = {
 
 //user action address parts
