@@ -1034,11 +1034,12 @@ instance.prototype.init_feedbacks = function(){
 			{id:'videoStatus',	 label:'Video Status'},
 			{id:'audioStatus',	 label:'Audio Status'},
 			{id:'activeSpeaker', label:'Active Speaker Status'},
-			{id:'handStatus',		 label:'Hand Raised Status'},
-			{id:'selected',		   label:'Selected'},
-			{id:'cameraDevice',  label:'Current Camera Device'},
-			{id:'micDevice',     label:'Current Mic Device'},
-			{id:'speakerDevice', label:'Current Speaker Device'}
+			{id:'handStatus',		label:'Hand Raised Status'},
+			{id:'spotlightStatus',		label:'Spotlight Status'},
+			{id:'selected',		label:'Selected'},
+			{id:'cameraDevice',label:'Current Camera Device'},
+			{id:'micDevice',label:'Current Mic Device'},
+			{id:'speakerDevice',label:'Current Speaker Device'}
 
 	];
 
