@@ -906,6 +906,7 @@ instance.prototype.init_feedbacks = function(){
 			{id:'audioStatus',	 label:'Audio Status'},
 			{id:'activeSpeaker', label:'Active Speaker Status'},
 			{id:'handStatus',		label:'Hand Raised Status'},
+			{id:'spotlightStatus',		label:'Spotlight Status'},
 			{id:'selected',		label:'Selected'},
 			{id:'cameraDevice',label:'Current Camera Device'},
 			{id:'micDevice',label:'Current Mic Device'},
