@@ -677,7 +677,7 @@ instance.prototype.action = function(action) {
 		return;
 	}
 //set group type
-	var GROUP_TYPE = 'single';
+	var GROUP_TYPE = null;
 	var USER_GROUPS = true;
 	var MULTI_USER = false;
 	var HAS_TARGET = true;
@@ -685,8 +685,8 @@ instance.prototype.action = function(action) {
 	//get grouptype from array by id
 	let currentGroupType=self.groupTypesList.find(x => x.id === action.options.groupType);
 	console.log("GROUP TYPE: "+JSON.stringify(currentGroupType));
-	GROUP_TYPE=currentGroupType.id;
-	HAS_TARGET=currentGroupType.hasTarget;
+	GROUP_TYPE=currentGroupType == undefined ? 'singleuser' : currentGroupType.id;
+	HAS_TARGET=currentGroupType == undefined ? 'singleuser' : currentGroupType.hasTarget;
 	//set target type
 	var TARGET_TYPE=null;
 	var userString=[];
@@ -732,20 +732,18 @@ instance.prototype.action = function(action) {
 
 		//list index works internally
 		case "listIndex":
-			TARGET_TYPE="listIndex";
+			TARGET_TYPE=ZOSC.keywords.ZOSC_MSG_TARGET_PART_ZOOMID;
 			//switch to this so we spoof a zoomID message
 			for (let i in splitUserString){
 				var index = parseInt(action.options.userString);
 				index += self.zoomosc_client_data.listIndexOffset;
 
 				var users = Object.keys(self.user_data);
-				if (users.length > index)
-				{
+				if (users.length > index) {
 						userString.push(parseInt(self.user_data[users[index]].zoomID));
 				}
-				else {
-					userString = 0;
-				}
+				//else { userString = 0; }
+				//self.log('debug', 'listIndex targeting, index: ' + temp_index + ', users length: ' + temp_users.length);
 			}
 			break;
 
