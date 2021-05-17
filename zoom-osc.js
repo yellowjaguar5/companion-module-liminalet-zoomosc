@@ -138,7 +138,6 @@ instance.prototype.init_variables = function() {
 		{varName:'spotlightStatusText',  varString:'spotlightStatus',	     varLabel:'Spotlight Status'},
 		{varName:'handStatusText',			 varString:'handStatus',			 	   varLabel:'Hand Status'},
 		{varName:'activeSpeakerText',	   varString:'activeSpeaker',		     varLabel:'Active Speaker'},
-		{varName:'selected',		         varString:'selected',					   varLabel:'Selected'},
 		{varName: 'currentCameraDevice', varString:'currentCameraDevice',  varLabel:"Camera Device",     isList:false},
 		{varName: 'currentMicDevice',    varString:'currentMicDevice',     varLabel:"Microphone Device", isList:false},
 		{varName: 'currentSpeakerDevice',varString:'currentSpeakerDevice', varLabel:"Speaker Device",    isList:false},
@@ -990,24 +989,24 @@ if('USER_ACTION' in thisMsg && action.user!=ZOSC.keywords.ZOSC_MSG_PART_ME ){
 
 		switch(thisMsg.INTERNAL_ACTION){
 			case "addSelection":
-				if (!self.selectionList.includes(selectedUser.zoomID)) {
-					self.selectionList.push(selectedUser.zoomID);
+				if (!self.selectionList.includes(self.user_data[selectedUser].zoomID)) {
+					self.selectionList.push(self.user_data[selectedUser].zoomID);
 				}
-				//self.log('debug', "Add selection to " + self.user_data[selectedUser].userName);
+				//self.log('debug', "Add selection to " + self.user_data[selectedUser].userName + ", full list: " + JSON.stringify(self.selectionList));
 				break;
 			case "removeSelection":
-				if (self.selectionList.includes(selectedUser.zoomID)) {
-					self.selectionList = self.selectionList.filter(function(e) { return e !== selectedUser.zoomID; });
+				if (self.selectionList.includes(self.user_data[selectedUser].zoomID)) {
+					self.selectionList = self.selectionList.filter(function(e) { return e !== self.user_data[selectedUser].zoomID; });
 				}
-				//self.log('debug',"Remove selection from " + self.user_data[selectedUser].userName);
+				//self.log('debug',"Remove selection from " + self.user_data[selectedUser].userName + ", full list: " + JSON.stringify(self.selectionList));
 				break;
 			case "toggleSelection":
-				if (!self.selectionList.includes(selectedUser.zoomID)) {
-					self.selectionList.push(selectedUser.zoomID);
+				if (!self.selectionList.includes(self.user_data[selectedUser].zoomID)) {
+					self.selectionList.push(self.user_data[selectedUser].zoomID);
 				} else {
-					self.selectionList = self.selectionList.filter(function(e) { return e !== selectedUser.zoomID; });
+					self.selectionList = self.selectionList.filter(function(e) { return e !== self.user_data[selectedUser].zoomID; });
 				}
-				//self.log('debug',"Toggle selection " + self.user_data[selectedUser].userName);
+				//self.log('debug',"Toggle selection " + self.user_data[selectedUser].userName + ", full list: " + JSON.stringify(self.selectionList));
 				break;
 			case "clearSelection":
 				self.selectionList = [];
@@ -1379,6 +1378,7 @@ if(zoomPart==ZOSC.keywords.ZOSC_MSG_PART_ZOOMOSC){
 					if(userOnlineStatus==0){
 						// console.log("DELETE OFFLINE USER");
 						delete self.user_data[userZoomID];
+						self.selectionList = self.selectionList.filter(function(e) { return e !== userZoomID; });
 					}
 					else{
 						parseListRecvMsg(message.args,isMe);
