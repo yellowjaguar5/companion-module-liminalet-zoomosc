@@ -20,6 +20,7 @@ const ZOOM_MAX_GALLERY_SIZE_X = 7;
 function instance(system, id, config) {
 	console.log("INSTANCE");
 	this.userList=[];
+	this.selectionList=[];
 	var self = this;
 	//user data
 	self.user_data={};
@@ -137,7 +138,6 @@ instance.prototype.init_variables = function() {
 		{varName:'spotlightStatusText',  varString:'spotlightStatus',	     varLabel:'Spotlight Status'},
 		{varName:'handStatusText',			 varString:'handStatus',			 	   varLabel:'Hand Status'},
 		{varName:'activeSpeakerText',	   varString:'activeSpeaker',		     varLabel:'Active Speaker'},
-		{varName:'selected',		         varString:'selected',					   varLabel:'Selected'},
 		{varName: 'currentCameraDevice', varString:'currentCameraDevice',  varLabel:"Camera Device",     isList:false},
 		{varName: 'currentMicDevice',    varString:'currentMicDevice',     varLabel:"Microphone Device", isList:false},
 		{varName: 'currentSpeakerDevice',varString:'currentSpeakerDevice', varLabel:"Speaker Device",    isList:false},
@@ -750,17 +750,12 @@ instance.prototype.action = function(action) {
 //Selection targeting (internal)
 		case ZOSC.keywords.ZOSC_MSG_TARGET_PART_SELECTION:
 			//add selected user to selection list
-				for (let user in self.user_data){
-					if(self.user_data[user].selected){
-						selectionZoomIDs.push(user);
-					}
-				}
-				if (selectionZoomIDs.length > 1) {  // multiple users selected
+				if (self.selectionList.length > 1) {  // multiple users selected
 					TARGET_TYPE=ZOSC.keywords.ZOSC_MSG_GROUP_PART_USERS+'/'+ZOSC.keywords.ZOSC_MSG_TARGET_PART_ZOOMID;
-					userString = selectionZoomIDs;
+					userString = self.selectionList;
 				} else {  // single user
 					TARGET_TYPE=ZOSC.keywords.ZOSC_MSG_TARGET_PART_ZOOMID;
-					userString = parseInt(selectionZoomIDs[0]);
+					userString = parseInt(self.selectionList[0]);
 				}
 				//self.log('debug', "user selection ("+selectionZoomIDs.length + "): " + userString);
 				break;
@@ -994,21 +989,27 @@ if('USER_ACTION' in thisMsg && action.user!=ZOSC.keywords.ZOSC_MSG_PART_ME ){
 
 		switch(thisMsg.INTERNAL_ACTION){
 			case "addSelection":
-				self.user_data[selectedUser].selected = true;
-				//self.log('debug', "Add selection to " + self.user_data[selectedUser].userName);
+				if (!self.selectionList.includes(self.user_data[selectedUser].zoomID)) {
+					self.selectionList.push(self.user_data[selectedUser].zoomID);
+				}
+				//self.log('debug', "Add selection to " + self.user_data[selectedUser].userName + ", full list: " + JSON.stringify(self.selectionList));
 				break;
 			case "removeSelection":
-				self.user_data[selectedUser].selected = false;
-				//self.log('debug',"Remove selection from " + self.user_data[selectedUser].userName);
+				if (self.selectionList.includes(self.user_data[selectedUser].zoomID)) {
+					self.selectionList = self.selectionList.filter(function(e) { return e !== self.user_data[selectedUser].zoomID; });
+				}
+				//self.log('debug',"Remove selection from " + self.user_data[selectedUser].userName + ", full list: " + JSON.stringify(self.selectionList));
 				break;
 			case "toggleSelection":
-				self.user_data[selectedUser].selected = !(self.user_data[selectedUser].selected);
-				//self.log('debug',"Toggle selection " + self.user_data[selectedUser].userName);
+				if (!self.selectionList.includes(self.user_data[selectedUser].zoomID)) {
+					self.selectionList.push(self.user_data[selectedUser].zoomID);
+				} else {
+					self.selectionList = self.selectionList.filter(function(e) { return e !== self.user_data[selectedUser].zoomID; });
+				}
+				//self.log('debug',"Toggle selection " + self.user_data[selectedUser].userName + ", full list: " + JSON.stringify(self.selectionList));
 				break;
 			case "clearSelection":
-				for (let user in self.user_data){
-					self.user_data[user].selected = false;
-				}
+				self.selectionList = [];
 				//self.log('debug',"Clear selection");
 				break;
 			default:
@@ -1183,7 +1184,9 @@ instance.prototype.init_feedbacks = function(){
 				var userToFeedback=self.user_data[sourceUser];
 				if(userToFeedback!=undefined){
 				var propertyToFeedback=opts.prop;
-				var userPropVal=userToFeedback[propertyToFeedback];
+				var userPropVal= propertyToFeedback != 'selected' ? 
+					userToFeedback[propertyToFeedback] : 
+					self.selectionList.includes(userToFeedback.zoomID);
 				//
 					if (userPropVal==parseInt(opts.propertyValue)){
 						return{
@@ -1375,6 +1378,7 @@ if(zoomPart==ZOSC.keywords.ZOSC_MSG_PART_ZOOMOSC){
 					if(userOnlineStatus==0){
 						// console.log("DELETE OFFLINE USER");
 						delete self.user_data[userZoomID];
+						self.selectionList = self.selectionList.filter(function(e) { return e !== userZoomID; });
 					}
 					else{
 						parseListRecvMsg(message.args,isMe);
