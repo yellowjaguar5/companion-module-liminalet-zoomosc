@@ -111,8 +111,7 @@ instance.prototype.init = function() {
 instance.prototype.init_variables = function() {
 
 	var self = this;
-	var variables= null;
-	variables = [];
+	self.variables= [];
 	//print list of users
 	// console.log("USERS: "+JSON.stringify(self.user_data));
 	// self.log('debug',"USERS: "+JSON.stringify(self.user_data));
@@ -200,7 +199,7 @@ for(var variableToPublish in variablesToPublishList){
 								//if the variable has a value push and set it
 								if(thisVariableValue != null && thisVariableValue != undefined){
 									//push variable and set
-									variables.push({
+									self.variables.push({
 										label:thisFormattedVarLabel,
 										name: thisFormattedVarName
 									});
@@ -343,7 +342,7 @@ for(let clientVar in clientdatalabels){
 
 	}
 
-		variables.push({
+		self.variables.push({
 			label: clientdatalabels[clientVar],
 			name:	'client_'+clientVar
 		});
@@ -351,7 +350,7 @@ for(let clientVar in clientdatalabels){
 	   self.setVariable('client_'+clientVar,clientVarVal);
 	}
 
-  self.setVariableDefinitions(variables);
+  self.setVariableDefinitions(self.variables);
 };
 
 
@@ -1254,6 +1253,16 @@ if(zoomPart==ZOSC.keywords.ZOSC_MSG_PART_ZOOMOSC){
 					// let userNameToTest= message.args[1].value;
 					let userZoomID=		 message.args[3].value;
 					let userOnlineStatus= message.args[7].value;
+					if (isMe) { //On first list msg receive, clear all vars
+						self.log('debug', "vars to clear: " + JSON.stringify(self.variables));
+						for (let variable_name in self.variables) {//.filter(e => !('client_' in e.name))
+							self.setVariable( variable_name, "-");
+						}
+					}
+					for (let variable_name in self.variables) {
+						self.setVariable( variable_name, "-");
+					}
+					
 
 					if(userOnlineStatus==0){
 						// console.log("DELETE OFFLINE USER");
