@@ -23,6 +23,7 @@ function instance(system, id, config) {
 	var self = this;
 	//user data
 	self.user_data={};
+	self.all_variables = [];
 	//contains data from connected ZoomOSC instance
 	self.zoomosc_client_data										 = [];
 	self.zoomosc_client_data.last_ping					 = 0;
@@ -203,6 +204,7 @@ for(var variableToPublish in variablesToPublishList){
 										label:thisFormattedVarLabel,
 										name: thisFormattedVarName
 									});
+									if (self.all_variables.indexOf(thisFormattedVarName) === -1) self.all_variables.push(thisFormattedVarName);
 									self.setVariable( thisFormattedVarName, thisVariableValue);
 								}
 
@@ -261,6 +263,11 @@ self.zoomosc_client_data.oldgalleryShape = Object.assign({}, self.zoomosc_client
 
 		}
 }
+self.log('debug', JSON.stringify(self.all_variables.filter(val => !self.variables.some(obj => obj.name == val))));
+for (let variable_name in self.all_variables.filter(val => !self.variables.includes(val))) {
+	if (!Number.isInteger(parseInt(variable_name))){
+	self.setVariable(variable_name, '-');
+} }
 
 //Client variables
 var clientdatalabels = {
@@ -1253,16 +1260,6 @@ if(zoomPart==ZOSC.keywords.ZOSC_MSG_PART_ZOOMOSC){
 					// let userNameToTest= message.args[1].value;
 					let userZoomID=		 message.args[3].value;
 					let userOnlineStatus= message.args[7].value;
-					if (isMe) { //On first list msg receive, clear all vars
-						self.log('debug', "vars to clear: " + JSON.stringify(self.variables));
-						for (let variable_name in self.variables) {//.filter(e => !('client_' in e.name))
-							self.setVariable( variable_name, "-");
-						}
-					}
-					for (let variable_name in self.variables) {
-						self.setVariable( variable_name, "-");
-					}
-					
 
 					if(userOnlineStatus==0){
 						// console.log("DELETE OFFLINE USER");
