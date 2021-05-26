@@ -23,7 +23,7 @@ function instance(system, id, config) {
 	var self = this;
 	//user data
 	self.user_data={};
-	self.all_variables = [];
+	self.last_variables = [];
 	//contains data from connected ZoomOSC instance
 	self.zoomosc_client_data										 = [];
 	self.zoomosc_client_data.last_ping					 = 0;
@@ -113,7 +113,6 @@ instance.prototype.init_variables = function() {
 
 	var self = this;
 	self.variables= [];
-	var current_variables = [];
 	//print list of users
 	// console.log("USERS: "+JSON.stringify(self.user_data));
 	// self.log('debug',"USERS: "+JSON.stringify(self.user_data));
@@ -205,7 +204,6 @@ for(var variableToPublish in variablesToPublishList){
 										label:thisFormattedVarLabel,
 										name: thisFormattedVarName
 									});
-									current_variables.push(thisFormattedVarName);
 
 									self.setVariable( thisFormattedVarName, thisVariableValue);
 								}
@@ -264,19 +262,15 @@ self.zoomosc_client_data.oldgalleryShape = Object.assign({}, self.zoomosc_client
 			setVariablesForUser(this_user,userSourceList,variablesToPublishList);
 
 		}
-}
-var vars_to_clear = self.all_variables.filter(val => !current_variables.includes(val));
-if (self.all_variables.length > 1) self.log('debug', '"self.all_variables": '+JSON.stringify(self.all_variables));
-if (current_variables.length > 1) self.log('debug', '"current_variables": '+JSON.stringify(current_variables));
+
+var current_variables = self.variables.map(object => object.name);
+var vars_to_clear = self.last_variables.filter(val => !current_variables.includes(val.name) && !val.name.startsWith("client"));
 if (vars_to_clear.length > 1) self.log('debug', '"vars_to_clear": '+JSON.stringify(vars_to_clear));
-for (let variable_name in vars_to_clear) {
-	if (!Number.isInteger(parseInt(variable_name))){
-	self.setVariable(variable_name, '-');
-} }
+if (vars_to_clear.length > 1) self.log('debug', '"self.variables": '+JSON.stringify(self.variables));
+vars_to_clear.forEach(value => self.setVariable(value.name, '-'));
+self.last_variables = self.variables;
 
-self.all_variables = self.all_variables.filter(val => !vars_to_clear.includes(val));
-self.all_variables = self.all_variables.concat(current_variables.filter(item => self.all_variables.indexOf(item) < 0));
-
+}
 //Client variables
 var clientdatalabels = {
 zoomOSCVersion:'ZoomOSC Version',
@@ -1488,6 +1482,8 @@ console.log(message.address.toString());
 			case ZOSC.outputFullMessages.ZOSC_MSG_SEND_LIST_CLEAR.MESSAGE:
 			 console.log("clearing list");
 			 self.user_data={};
+			 //self.variables.forEach(value => { self.setVariable(value.name, '-');});
+			 self.log('debug', 'List cleared');
 			 break;
 
 		 default:
