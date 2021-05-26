@@ -113,6 +113,7 @@ instance.prototype.init_variables = function() {
 
 	var self = this;
 	self.variables= [];
+	var current_variables = [];
 	//print list of users
 	// console.log("USERS: "+JSON.stringify(self.user_data));
 	// self.log('debug',"USERS: "+JSON.stringify(self.user_data));
@@ -204,7 +205,8 @@ for(var variableToPublish in variablesToPublishList){
 										label:thisFormattedVarLabel,
 										name: thisFormattedVarName
 									});
-									if (self.all_variables.indexOf(thisFormattedVarName) === -1) self.all_variables.push(thisFormattedVarName);
+									current_variables.push(thisFormattedVarName);
+
 									self.setVariable( thisFormattedVarName, thisVariableValue);
 								}
 
@@ -263,11 +265,17 @@ self.zoomosc_client_data.oldgalleryShape = Object.assign({}, self.zoomosc_client
 
 		}
 }
-self.log('debug', JSON.stringify(self.all_variables.filter(val => !self.variables.some(obj => obj.name == val))));
-for (let variable_name in self.all_variables.filter(val => !self.variables.includes(val))) {
+var vars_to_clear = self.all_variables.filter(val => !current_variables.includes(val));
+if (self.all_variables.length > 1) self.log('debug', '"self.all_variables": '+JSON.stringify(self.all_variables));
+if (current_variables.length > 1) self.log('debug', '"current_variables": '+JSON.stringify(current_variables));
+if (vars_to_clear.length > 1) self.log('debug', '"vars_to_clear": '+JSON.stringify(vars_to_clear));
+for (let variable_name in vars_to_clear) {
 	if (!Number.isInteger(parseInt(variable_name))){
 	self.setVariable(variable_name, '-');
 } }
+
+self.all_variables = self.all_variables.filter(val => !vars_to_clear.includes(val));
+self.all_variables = self.all_variables.concat(current_variables.filter(item => self.all_variables.indexOf(item) < 0));
 
 //Client variables
 var clientdatalabels = {
