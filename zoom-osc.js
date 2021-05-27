@@ -259,14 +259,14 @@ self.zoomosc_client_data.oldgalleryShape = Object.assign({}, self.zoomosc_client
 			var this_user = self.user_data[user];
 			this_user.listIndex = i++;
 			console.log("setting variables for user ", this_user);
-			setVariablesForUser(this_user,userSourceList,variablesToPublishList);
-
+			if (this_user.onlineStatus) setVariablesForUser(this_user,userSourceList,variablesToPublishList);
 		}
 
 var current_variables = self.variables.map(object => object.name);
 var vars_to_clear = self.last_variables.filter(val => !current_variables.includes(val.name) && !val.name.startsWith("client"));
 if (vars_to_clear.length > 1) self.log('debug', '"vars_to_clear": '+JSON.stringify(vars_to_clear));
-if (vars_to_clear.length > 1) self.log('debug', '"self.variables": '+JSON.stringify(self.variables));
+//if (vars_to_clear.length > 1) self.log('debug', '"self.variables": '+JSON.stringify(self.variables));
+vars_to_clear.forEach(value => self.log('info', value + value.name));
 vars_to_clear.forEach(value => self.setVariable(value.name, '-'));
 self.last_variables = self.variables;
 
