@@ -1,19 +1,19 @@
 //Liminal ZoomOSC Plugin for BitFocus Companion
 var instance_skel = require('../../instance_skel');
-var OSC 					= require('osc');
+var OSC = require('osc');
 //API file
-var ZOSC=require('./zoscconstants.js');
+var ZOSC = require('./zoscconstants.js');
 //Icons file
-var ZOSC_ICONS=require('./zoscicons.js');
+var ZOSC_ICONS = require('./zoscicons.js');
 var debug;
 var log;
 
 const PING_TIME_ERR = 15000;
-const PING_TIMEOUT	= 3000;
+const PING_TIMEOUT  = 3000;
 //default network settings
-const DEF_TX_PORT	  = '9090';
-const DEF_TX_IP		  = '127.0.0.1';
-const DEF_RX_PORT	  = '1234';
+const DEF_TX_PORT   = '9090';
+const DEF_TX_IP     = '127.0.0.1';
+const DEF_RX_PORT   = '1234';
 
 const ZOOM_MAX_GALLERY_SIZE_Y = 7;
 const ZOOM_MAX_GALLERY_SIZE_X = 7;
@@ -25,19 +25,19 @@ function instance(system, id, config) {
 	//user data
 	self.user_data={};
 	//contains data from connected ZoomOSC instance
-	self.zoomosc_client_data										 = [];
-	self.zoomosc_client_data.last_ping					 = 0;
-	self.zoomosc_client_data.subscribeMode			 = 0;
-	self.zoomosc_client_data.galleryShape				 = [0,0];
-	self.zoomosc_client_data.oldgalleryShape		 = [0,0];
-	self.zoomosc_client_data.activeSpeaker			 = "None";
-	self.zoomosc_client_data.zoomOSCVersion			 = "Not Connected";
-	self.zoomosc_client_data.subscribeMode			 =	0;
-	self.zoomosc_client_data.galTrackMode				 =	0;
-	self.zoomosc_client_data.callStatus					 =	0;
-	self.zoomosc_client_data.numberOfTargets		 =	0;
-	self.zoomosc_client_data.numberOfUsersInCall =	0;
-	self.zoomosc_client_data.listIndexOffset = 0;
+	self.zoomosc_client_data                       = [];
+	self.zoomosc_client_data.last_ping             = 0;
+	self.zoomosc_client_data.subscribeMode         = 0;
+	self.zoomosc_client_data.galleryShape          = [0,0];
+	self.zoomosc_client_data.oldgalleryShape       = [0,0];
+	self.zoomosc_client_data.activeSpeaker         = "None";
+	self.zoomosc_client_data.zoomOSCVersion        = "Not Connected";
+	self.zoomosc_client_data.subscribeMode         = 0;
+	self.zoomosc_client_data.galTrackMode          = 0;
+	self.zoomosc_client_data.callStatus            = 0;
+	self.zoomosc_client_data.numberOfTargets       = 0;
+	self.zoomosc_client_data.numberOfUsersInCall   = 0;
+	self.zoomosc_client_data.listIndexOffset       = 0;
 	self.zoomosc_client_data.numberOfSelectedUsers = 0;
 
 
@@ -53,13 +53,13 @@ function instance(system, id, config) {
 
 //Subscribe to ZoomOSC
 	self.system.emit('osc_send',
-		self.config.host,				self.config.port,
+		self.config.host, self.config.port,
 		ZOSC.actions.APP_ACTION_GROUP.MESSAGES.ZOSC_MSG_SUBSCRIBE.MESSAGE,
 		 {type: 'f', value: parseFloat(self.config.subscribeMode)}
 	);
 	//set gallery track mode
 	self.system.emit('osc_send',
-		self.config.host,				self.config.port,
+		self.config.host, self.config.port,
 		ZOSC.actions.APP_ACTION_GROUP.MESSAGES.ZOSC_MSG_GALTRACK_MODE.MESSAGE,
 		{type: 'i', value: parseInt(self.config.galTrackMode)}
 	);
@@ -85,13 +85,13 @@ instance.prototype.updateConfig = function(config) {
 	self.actions();
 	//Subscribe to ZoomOSC
 		self.system.emit('osc_send',
-			self.config.host,				self.config.port,
+			self.config.host, self.config.port,
 			ZOSC.actions.APP_ACTION_GROUP.MESSAGES.ZOSC_MSG_SUBSCRIBE.MESSAGE,
 			 {type: 'f', value: parseFloat(self.config.subscribeMode)}
 		);
 		//set gallery track mode
 		self.system.emit('osc_send',
-			self.config.host,				self.config.port,
+			self.config.host, self.config.port,
 			ZOSC.actions.APP_ACTION_GROUP.MESSAGES.ZOSC_MSG_GALTRACK_MODE.MESSAGE,
 			{type: 'i', value: parseInt(self.config.galTrackMode)}
 		);
@@ -123,34 +123,35 @@ instance.prototype.init_variables = function() {
 	// self.log('debug',"USERS: "+JSON.stringify(self.user_data));
 
 	var userSourceList=[
-		{varName:'userName',						varString:'user',							varLabel:''},
-		{varName:'index',							 varString:'tgtID',						 varLabel:'Target ID'},
-		{varName:'galleryIndex',				varString:'galInd',						varLabel:'Gallery Index'},
-		{varName:'galleryPosition',		 varString:'galPos',						varLabel:'Gallery Position'},
-		{varName:'listIndex',		 varString:'listIndex',						varLabel:'List Index'}
+		{varName:'userName',        varString:'user',      varLabel:''},
+		{varName:'index',           varString:'tgtID',     varLabel:'Target ID'},
+		{varName:'galleryIndex',    varString:'galInd',    varLabel:'Gallery Index'},
+		{varName:'galleryPosition', varString:'galPos',    varLabel:'Gallery Position'},
+		{varName:'listIndex',       varString:'listIndex', varLabel:'List Index'},
+		{varName:'me',              varString:'me',        varLabel:'Me'}
 
 	];
 	//variable name in user data, string to tag companion variable
 	var variablesToPublishList=[
-		{varName:'index',						varString:'index',					 varLabel:"Target ID"},
-		{varName:'userName',						varString:'userName',					 varLabel:"User Name"},
-		{varName:'galleryIndex',				varString:'galIndex',					 varLabel:'Gallery Index'},
-		{varName:'roleText',						varString:'role',							 varLabel:'Role'},
-		{varName:'onlineStatusText',		varString:'onlineStatus',			 varLabel:'Online Status'},
-		{varName:'videoStatusText',		  varString:'videoStatus',			 varLabel:'Video Status'},
-		{varName:'audioStatusText',		  varString:'audioStatus',			 varLabel:'Audio Status'},
-		{varName:'spotlightStatusText', varString:'spotlightStatus',	 varLabel:'Spotlight Status'},
-		{varName:'handStatusText',			 varString:'handStatus',				 varLabel:'Hand Status'},
-		{varName:'activeSpeakerText',	   varString:'activeSpeaker',		 varLabel:'Active Speaker'},
-		{varName:'selected',		 varString:'selected',						varLabel:'Selected'},
-		{varName: 'currentCameraDevice', varString:'currentCameraDevice',     varLabel:"Camera Device",     isList:false},
-		{varName: 'currentMicDevice',    varString:'currentMicDevice',        varLabel:"Microphone Device", isList:false},
-		{varName: 'currentSpeakerDevice',varString:'currentSpeakerDevice',    varLabel:"Speaker Device",    isList:false},
-		{varName: 'currentBackground',   varString:'currentBackground',       varLabel:"Background",        isList:false},
-		{varName: 'cameraDevices',      varString:'cameraDevices',     varLabel:"Camera Device",     isList:true},
-		{varName: 'micDevices',         varString:'micDevices',        varLabel:"Microphone Device", isList:true},
-		{varName: 'speakerDevices',     varString:'speakerDevices',    varLabel:"Speaker Device",    isList:true}
-		// {varName: 'backgrounds',        varString:'backgrounds',       varLabel:"Background",        isList:true}
+		{varName:'index',                 varString:'index',                varLabel:"Target ID"},
+		{varName:'userName',              varString:'userName',             varLabel:"User Name"},
+		{varName:'galleryIndex',          varString:'galIndex',             varLabel:'Gallery Index'},
+		{varName:'roleText',              varString:'role',                 varLabel:'Role'},
+		{varName:'onlineStatusText',      varString:'onlineStatus',         varLabel:'Online Status'},
+		{varName:'videoStatusText',       varString:'videoStatus',          varLabel:'Video Status'},
+		{varName:'audioStatusText',       varString:'audioStatus',          varLabel:'Audio Status'},
+		{varName:'spotlightStatusText',   varString:'spotlightStatus',      varLabel:'Spotlight Status'},
+		{varName:'handStatusText',        varString:'handStatus',           varLabel:'Hand Status'},
+		{varName:'activeSpeakerText',     varString:'activeSpeaker',        varLabel:'Active Speaker'},
+		{varName:'selected',              varString:'selected',             varLabel:'Selected'},
+		{varName: 'currentCameraDevice',  varString:'currentCameraDevice',  varLabel:"Camera Device",     isList:false},
+		{varName: 'currentMicDevice',     varString:'currentMicDevice',     varLabel:"Microphone Device", isList:false},
+		{varName: 'currentSpeakerDevice', varString:'currentSpeakerDevice', varLabel:"Speaker Device",    isList:false},
+		{varName: 'currentBackground',    varString:'currentBackground',    varLabel:"Background",        isList:false},
+		{varName: 'cameraDevices',        varString:'cameraDevices',        varLabel:"Camera Device",     isList:true},
+		{varName: 'micDevices',           varString:'micDevices',           varLabel:"Microphone Device", isList:true},
+		{varName: 'speakerDevices',       varString:'speakerDevices',       varLabel:"Speaker Device",    isList:true}
+		//{varName: 'backgrounds',          varString:'backgrounds',          varLabel:"Background",        isList:true}
 	];
 
 function setVariablesForUser(sourceUser,userSourceList,variablesToPublishList){
@@ -270,19 +271,19 @@ self.zoomosc_client_data.oldgalleryShape = Object.assign({}, self.zoomosc_client
 
 //Client variables
 var clientdatalabels = {
-zoomOSCVersion:'ZoomOSC Version',
-subscribeMode:'Subscribe Mode',
-galTrackMode:'Gallery Tracking Mode',
-callStatus :'Call Status',
-numberOfTargets:'Number of Targets',
-numberOfUsersInCall: 'Number of Users in Call',
-activeSpeaker:'Active Speaker',
-listIndexOffset:'Current List Index Offset',
-numberOfSelectedUsers:'Number of users in Selection group'
-
+  zoomOSCVersion:        'ZoomOSC Version',
+  subscribeMode:         'Subscribe Mode',
+  galTrackMode:          'Gallery Tracking Mode',
+  callStatus:            'Call Status',
+  numberOfTargets:       'Number of Targets',
+  numberOfUsersInCall:   'Number of Users in Call',
+  activeSpeaker:         'Active Speaker',
+  listIndexOffset:       'Current List Index Offset',
+  numberOfSelectedUsers: 'Number of users in Selection group'
 };
+
 var clientVarVal=0;
-//
+
 for(let clientVar in clientdatalabels){
 	//ZoomOSC Version
 	switch(clientVar){
@@ -365,57 +366,57 @@ instance.prototype.config_fields = function() {
 	var self = this;
 	return [{
 
-			type:	'text',
-			id:		'info',
+			type:  'text',
+			id:    'info',
 			width: 12,
 			label: 'Information',
 			value: "ZoomOSC opens a bidirectional Open Sound Control interface to Zoom.<br> This integration creates easy access to ZoomOSC's control commands and also exposes a set of variables that will be automatically updated by ZoomOSC during the meeting. <br>More information at <a href='https://www.liminalet.com/zoomosc' target='_new'>liminalet.com/zoomosc</a>"
 		},
 		{
-			type:	'textinput',
-			id:		'host',
-			label: 'Target IP',
-			width: 8,
-			regex: self.REGEX_IP,
+			type:    'textinput',
+			id:      'host',
+			label:   'Target IP',
+			width:   8,
+			regex:   self.REGEX_IP,
 			default: DEF_TX_IP
 		},
 		{
-			type:	'textinput',
-			id:		'port',
-			label: 'Target Port',
-			width: 4,
-			regex: self.REGEX_PORT,
-			default:DEF_TX_PORT
+			type:    'textinput',
+			id:      'port',
+			label:   'Target Port',
+			width:   4,
+			regex:   self.REGEX_PORT,
+			default: DEF_TX_PORT
 		},
 		{
-			type:	'textinput',
-			id:		'feedbackPort',
-			label: 'Feedback Port',
-			width: 4,
-			regex: self.REGEX_PORT,
-			default:DEF_RX_PORT
+			type:    'textinput',
+			id:      'feedbackPort',
+			label:   'Feedback Port',
+			width:   4,
+			regex:   self.REGEX_PORT,
+			default: DEF_RX_PORT
 		},
 
 		{
-			type: 'dropdown',
-			id:	 'subscribeMode',
+			type:  'dropdown',
+			id:    'subscribeMode',
 			label: 'Subscribe Mode',
 			choices:[
-				{id: ZOSC.enums.SubscribeModeNone,					 label: 'None'						 },
-				{id: ZOSC.enums.SubscribeModeTargetList,		 label: 'Target List'			},
-				{id: ZOSC.enums.SubscribeModeAll,						label: 'All'							},
-				{id: ZOSC.enums.SubscribeModePanelists,			label: 'Panelists'				},
-				{id: ZOSC.enums.SubscribeModeOnlyGallery,		label: 'Only Gallery'		 }
+				{id: ZOSC.enums.SubscribeModeNone,        label: 'None'},
+				{id: ZOSC.enums.SubscribeModeTargetList,  label: 'Target List'},
+				{id: ZOSC.enums.SubscribeModeAll,         label: 'All'},
+				{id: ZOSC.enums.SubscribeModePanelists,   label: 'Panelists'},
+				{id: ZOSC.enums.SubscribeModeOnlyGallery, label: 'Only Gallery'}
 			],
 			default: ZOSC.enums.SubscribeModeAll
 		},
 		{
-			type: 'dropdown',
-			id:	 'galTrackMode',
+			type:  'dropdown',
+			id:    'galTrackMode',
 			label: 'Gallery Tracking Mode ---ZOOMID MODE REQUIRED FOR GALLERY TRACKING FEATURES---',
 			choices:[
 				{id: ZOSC.enums.GalleryTrackModeTargetIndex, label: 'Target Index'},
-				{id: ZOSC.enums.GalleryTrackModeZoomID,			label: 'ZoomID'			}
+				{id: ZOSC.enums.GalleryTrackModeZoomID,	     label: 'ZoomID'}
 
 			],
 			default: ZOSC.enums.GalleryTrackModeZoomID
@@ -441,32 +442,32 @@ var allInstanceActions=[];
 //get list of users
  this.userList={
 						[ZOSC.keywords.ZOSC_MSG_TARGET_PART_TARGET]:{
-								id:ZOSC.keywords.ZOSC_MSG_TARGET_PART_TARGET,
-							 label:'--Target Index--'
+							id:ZOSC.keywords.ZOSC_MSG_TARGET_PART_TARGET,
+							label:'--Target Index--'
 						 },
 						[ZOSC.keywords.ZOSC_MSG_TARGET_PART_GALINDEX]:{
 							id:ZOSC.keywords.ZOSC_MSG_TARGET_PART_GALINDEX,
-							 label:'--Gallery Index--'
+							label:'--Gallery Index--'
 						 },
 						[ZOSC.keywords.ZOSC_MSG_TARGET_PART_GALLERY_POSITION]:{
 							id:ZOSC.keywords.ZOSC_MSG_TARGET_PART_GALLERY_POSITION,
-							 label: '--Gallery Position--'
+							label: '--Gallery Position--'
 						 },
 						[ZOSC.keywords.ZOSC_MSG_PART_ME]:{
 							id:ZOSC.keywords.ZOSC_MSG_PART_ME,
-							 label:'--Me--'
+							label:'--Me--'
 						 },
 						 [ZOSC.keywords.ZOSC_MSG_TARGET_PART_SELECTION]:{
 							id:ZOSC.keywords.ZOSC_MSG_TARGET_PART_SELECTION,
-							 label:'--Selection--'
+							label:'--Selection--'
 						 },
 						["listIndex"]:{
 							id:"listIndex",
-							 label: '--List Index--'
+							label: '--List Index--'
 						 },
 						[ZOSC.keywords.ZOSC_MSG_TARGET_PART_USERNAME]:{
 							id:ZOSC.keywords.ZOSC_MSG_TARGET_PART_USERNAME,
-							 label: '--Specify Username--'
+							label: '--Specify Username--'
 						 }
 						};
 	//loop through user data to get usernames
@@ -498,8 +499,8 @@ var allInstanceActions=[];
 		//app action group has different interface
 		if(userActionGroup=='APP_ACTION_GROUP'){
 			newGroup={
-				id:		 thisGroup.TITLE,
-				label:	thisGroup.TITLE,
+				id:    thisGroup.TITLE,
+				label: thisGroup.TITLE,
 				options:[
 					{
 						type:'dropdown',
@@ -513,8 +514,8 @@ var allInstanceActions=[];
 			}
 			else{
 				newGroup={
-					id:		 thisGroup.TITLE,
-					label:	thisGroup.TITLE,
+					id:    thisGroup.TITLE,
+					label: thisGroup.TITLE,
 					options:[
 
 						{
@@ -596,14 +597,18 @@ var allInstanceActions=[];
 	}
 //set actions in ui
 	allInstanceActions["listIndexOffset"] = {
-		id:		 "listIndexOffset",
-		label:	"List Index Offset",
+		id:    "listIndexOffset",
+		label: "List Index Offset",
 		options:[
 			{
 				type:'dropdown',
 				label:'offset type',
 				id:'offsetType',
-				choices:[{label:'To index', id: 'toIndex'}, {id: 'increase', label:'increase by'}, {id: 'decrease', label: 'decrease by'}],
+				choices:[
+					{label:'To index', id: 'toIndex'}, 
+					{id: 'increase', label:'increase by'}, 
+					{id: 'decrease', label: 'decrease by'}
+				],
 				default:'toIndex'
 			}, {
 				type: 'number',
@@ -707,7 +712,7 @@ instance.prototype.action = function(action) {
 				var users = Object.keys(self.user_data);
 				if (users.length > index)
 				{
-						userString= parseInt(self.user_data[users[index]].zoomID);
+					userString= parseInt(self.user_data[users[index]].zoomID);
 				} 
 				//else { userString = 0; }
 
@@ -761,18 +766,19 @@ instance.prototype.action = function(action) {
 if('USER_ACTION' in thisMsg && action.user!=ZOSC.keywords.ZOSC_MSG_PART_ME ){
 	var targetType = TARGET_TYPE;
 	if (targetType == "listIndex") targetType = ZOSC.keywords.ZOSC_MSG_TARGET_PART_ZOOMID;
-	path=	'/'+ZOSC.keywords.ZOSC_MSG_PART_ZOOM+'/'+targetType+'/'+thisMsg.USER_ACTION;
+	path = '/'+ZOSC.keywords.ZOSC_MSG_PART_ZOOM+'/'+targetType+'/'+thisMsg.USER_ACTION;
 		//make user
-	if(TARGET_TYPE==ZOSC.keywords.ZOSC_MSG_TARGET_PART_GALINDEX||TARGET_TYPE==ZOSC.keywords.ZOSC_MSG_TARGET_PART_TARGET||TARGET_TYPE==ZOSC.keywords.ZOSC_MSG_TARGET_PART_ZOOMID||TARGET_TYPE == "listIndex"){
+	if ([ZOSC.keywords.ZOSC_MSG_TARGET_PART_GALINDEX,
+		  ZOSC.keywords.ZOSC_MSG_TARGET_PART_TARGET,
+		  ZOSC.keywords.ZOSC_MSG_TARGET_PART_ZOOMID,
+		  "listIndex"].includes(TARGET_TYPE)){
 		args.push({type:'i',value:parseInt(userString)});
-	}
-	else if(TARGET_TYPE==ZOSC.keywords.ZOSC_MSG_PART_ME){
+	} else if(TARGET_TYPE==ZOSC.keywords.ZOSC_MSG_PART_ME){
 
 	} else if(TARGET_TYPE==ZOSC.keywords.ZOSC_MSG_GROUP_PART_USERS+'/'+ZOSC.keywords.ZOSC_MSG_TARGET_PART_ZOOMID) {
 		selectionZoomIDs.forEach(id => args.push({type:'i',value:parseInt(id)}));
 		//self.log('debug', "selectionZoomIDs: " + selectionZoomIDs + ", args: " + JSON.stringify(args))
-	}
-	else{
+	} else{
 		args.push({type:'s',value:userString});
 	}
 
@@ -800,8 +806,7 @@ if('USER_ACTION' in thisMsg && action.user!=ZOSC.keywords.ZOSC_MSG_PART_ME ){
 	if(thisMsg.ARG_COUNT<1){
 		console.log("Sending OSC: "+path+" "+args);
 		self.system.emit('osc_send', self.config.host, self.config.port, path);
-		}
-	else{
+		} else{
 		//push arguments and send full message
 		// console.log(JSON.stringify(args));
 		pushOscArgs();
@@ -923,16 +928,16 @@ instance.prototype.init_feedbacks = function(){
 	var self = this;
 	var userStatusProperties= [
 
-			{id:'role',					label:'User Role'},
-			{id:'onlineStatus',	label:'Online Status'},
-			{id:'videoStatus',	 label:'Video Status'},
-			{id:'audioStatus',	 label:'Audio Status'},
+			{id:'role',          label:'User Role'},
+			{id:'onlineStatus',  label:'Online Status'},
+			{id:'videoStatus',   label:'Video Status'},
+			{id:'audioStatus',   label:'Audio Status'},
 			{id:'activeSpeaker', label:'Active Speaker Status'},
-			{id:'handStatus',		label:'Hand Raised Status'},
-			{id:'selected',		label:'Selected'},
-			{id:'cameraDevice',label:'Current Camera Device'},
-			{id:'micDevice',label:'Current Mic Device'},
-			{id:'speakerDevice',label:'Current Speaker Device'}
+			{id:'handStatus',    label:'Hand Raised Status'},
+			{id:'selected',      label:'Selected'},
+			{id:'cameraDevice',  label:'Current Camera Device'},
+			{id:'micDevice',     label:'Current Mic Device'},
+			{id:'speakerDevice', label:'Current Speaker Device'}
 
 	];
 
@@ -1133,21 +1138,21 @@ if(!self.disabled){
 			let devNumber       = devMsgArgs[4].value;
 			let devID           = devMsgArgs[6].value;
 			let devName         = devMsgArgs[7].value;
-			let isCurrentDev 		= devMsgArgs[8].value;
-			let devInfo         = {deviceId:devID,deviceName:devName,isCurrentDevice:isCurrentDev};
+			let isCurrentDev    = devMsgArgs[8].value;
+			let devInfo         = {deviceId:devID, deviceName:devName, isCurrentDevice:isCurrentDev};
 			let currentUser     = self.user_data[userZoomID];
 			currentUser[deviceType][devNumber]=devInfo;
 		}
 		//pong message
 		function parsePongRecvMsg(msgArgs){
 			// self.log('debug', 'connected to zoom');
-			self.zoomosc_client_data.last_ping					 =	Date.now();
-			self.zoomosc_client_data.zoomOSCVersion			 =	msgArgs[1].value;
-			self.zoomosc_client_data.subscribeMode			 =	msgArgs[2].value;
-			self.zoomosc_client_data.galTrackMode				 =	msgArgs[3].value;
-			self.zoomosc_client_data.callStatus					 =	msgArgs[4].value;
-			self.zoomosc_client_data.numberOfTargets		 =	msgArgs[5].value;
-			self.zoomosc_client_data.numberOfUsersInCall =	msgArgs[6].value;
+			self.zoomosc_client_data.last_ping           = Date.now();
+			self.zoomosc_client_data.zoomOSCVersion      = msgArgs[1].value;
+			self.zoomosc_client_data.subscribeMode       = msgArgs[2].value;
+			self.zoomosc_client_data.galTrackMode        = msgArgs[3].value;
+			self.zoomosc_client_data.callStatus          = msgArgs[4].value;
+			self.zoomosc_client_data.numberOfTargets     = msgArgs[5].value;
+			self.zoomosc_client_data.numberOfUsersInCall = msgArgs[6].value;
 			// self.checkFeedbacks('sub_bg');
 		}
 
@@ -1157,40 +1162,40 @@ if(!self.disabled){
 	//add the values from the list to the user at index supplied
 
 				var this_user = {
-					index:						msgArgs[0].value,
-					userName:				  msgArgs[1].value,
-					galleryIndex:		  msgArgs[2].value,
-					zoomID:					  msgArgs[3].value,
+					index:            msgArgs[0].value,
+					userName:         msgArgs[1].value,
+					galleryIndex:     msgArgs[2].value,
+					zoomID:           msgArgs[3].value,
 					participantCount: msgArgs[4].value,
-					listCount:				msgArgs[5].value,
-					role:						  msgArgs[6].value,
-					onlineStatus:		  msgArgs[7].value,
-					videoStatus:			msgArgs[8].value,
-					audioStatus:			msgArgs[9].value,
+					listCount:        msgArgs[5].value,
+					role:             msgArgs[6].value,
+					onlineStatus:     msgArgs[7].value,
+					videoStatus:      msgArgs[8].value,
+					audioStatus:      msgArgs[9].value,
 					spotlightStatus:  0,
-					activeSpeaker:		0,
-					selected: false,
-					handStatus:			  0,
-					cameraDevices:		[],
+					activeSpeaker:    0,
+					selected:         false,
+					handStatus:       0,
+					cameraDevices:    [],
 					micDevices:       [],
 					speakerDevices:   [],
 					backgrounds:      []
 
 
 				};
-				var roleTextVals=[
-					'None','For Users','Always','Full'
-				];
-				var onOffTextVals=['Off','On'];
-				var onlineTextVals=['Offline','Online'];
-				var handTextVals=['Down','Up'];
-				var activeSpeakerTextVals=['Inactive','Active'];
-				this_user.roleText						= roleTextVals[this_user.role];
-				this_user.videoStatusText		  = onOffTextVals[this_user.videoStatus];
-				this_user.audioStatusText		  = onOffTextVals[this_user.audioStatus];
-				this_user.onlineStatusText		= onlineTextVals[this_user.onlineStatus];
-				this_user.activeSpeakerText	  = activeSpeakerTextVals[this_user.activeSpeaker];
-				this_user.handStatusText			= handTextVals[this_user.handStatus];
+
+				var roleTextVals =              ['None','For Users','Always','Full'];
+				var onOffTextVals =             ['Off','On'];
+				var onlineTextVals =            ['Offline','Online'];
+				var handTextVals =              ['Down','Up'];
+				var activeSpeakerTextVals =     ['Inactive','Active'];
+
+				this_user.roleText =            roleTextVals[this_user.role];
+				this_user.videoStatusText =     onOffTextVals[this_user.videoStatus];
+				this_user.audioStatusText =     onOffTextVals[this_user.audioStatus];
+				this_user.onlineStatusText =    onlineTextVals[this_user.onlineStatus];
+				this_user.activeSpeakerText =   activeSpeakerTextVals[this_user.activeSpeaker];
+				this_user.handStatusText =      handTextVals[this_user.handStatus];
 				this_user.spotlightStatusText = onOffTextVals[this_user.spotlightStatus];
 
 				//DOES THIS EXIST???
@@ -1225,15 +1230,15 @@ if(!self.disabled){
 
 // console.log("Received OSC Message: "+ JSON.stringify(message));
 //list messages for users/me
-var recvMsg=message.address.toString().split('/');
-var zoomPart=recvMsg[1];
-var msgTypePart=recvMsg[2];
-var usrMsgTypePart=recvMsg[3];
+var recvMsg =        message.address.toString().split('/');
+var zoomPart =       recvMsg[1];
+var msgTypePart =    recvMsg[2];
+var usrMsgTypePart = recvMsg[3];
  // /zoomosc/galleryShape 1 2
 //zoomosc message
 if(zoomPart==ZOSC.keywords.ZOSC_MSG_PART_ZOOMOSC){
 	//if valid osc received, reset ping counter
-	self.zoomosc_client_data.last_ping					 =	Date.now();
+	self.zoomosc_client_data.last_ping = Date.now();
 	//target
 	switch(msgTypePart){
 		//Me
@@ -1244,7 +1249,7 @@ if(zoomPart==ZOSC.keywords.ZOSC_MSG_PART_ZOOMOSC){
 		case ZOSC.keywords.ZOSC_MSG_PART_USER:
 			// console.log("user/me MESSAGE RECEIVED");
 			// Info: sending OSC message /zoomosc/me/videoOff -1 "squirrel" 1 16780288
-			var usrMsgUser=message.args[3].value;
+			var usrMsgUser = message.args[3].value;
 			//type of user message
 			switch(usrMsgTypePart){
 				//List Received
@@ -1252,8 +1257,8 @@ if(zoomPart==ZOSC.keywords.ZOSC_MSG_PART_ZOOMOSC){
 					// console.log("LIST RECEIVED");
 					//test user name for no user
 					// let userNameToTest= message.args[1].value;
-					let userZoomID=		 message.args[3].value;
-					let userOnlineStatus= message.args[7].value;
+					let userZoomID =       message.args[3].value;
+					let userOnlineStatus = message.args[7].value;
 
 					if(userOnlineStatus==0){
 						// console.log("DELETE OFFLINE USER");
@@ -1501,12 +1506,12 @@ instance.prototype.init_ping = function() {
 		if(self.zoomosc_client_data.subscribeMode<1){
 			//set subscribe mode
 			self.system.emit('osc_send',
-				self.config.host,				self.config.port,
+				self.config.host, self.config.port,
 				ZOSC.actions.APP_ACTION_GROUP.MESSAGES.ZOSC_MSG_SUBSCRIBE.MESSAGE, {type: 'f', value: parseFloat(self.config.subscribeMode)}
 			);
 			//set gallery track mode
 			self.system.emit('osc_send',
-				self.config.host,				self.config.port,
+				self.config.host, self.config.port,
 				ZOSC.actions.APP_ACTION_GROUP.MESSAGES.ZOSC_MSG_GALTRACK_MODE.MESSAGE, {type: 'f', value: parseFloat(self.config.galTrackMode)}
 			);
 
@@ -1518,8 +1523,7 @@ instance.prototype.init_ping = function() {
 	setTimeout(function ping() {
 		if (self.disabled==true) {
 			self.status(self.STATUS_UNKNOWN,'Disabled');
-				}
-				else{
+				} else{
 		// self.getAllFeedbacks();
 		var timesinceping = Date.now() - self.zoomosc_client_data.last_ping;
 		//has ping been sent?
@@ -1535,13 +1539,13 @@ instance.prototype.init_ping = function() {
 		}
 		//Set Status to Error in config if ping not responded to
 		if (timesinceping > PING_TIME_ERR) {
-			self.zoomosc_client_data.state = 'offline';
-			self.zoomosc_client_data.zoomOSCVersion			=	"Not Connected";
-			self.zoomosc_client_data.subscribeMode			 =	0;
-			self.zoomosc_client_data.galTrackMode				=	0;
-			self.zoomosc_client_data.callStatus					=	0;
-			self.zoomosc_client_data.numberOfTargets		 =	0;
-			self.zoomosc_client_data.numberOfUsersInCall =	0;
+			self.zoomosc_client_data.state                 = 'offline';
+			self.zoomosc_client_data.zoomOSCVersion        = "Not Connected";
+			self.zoomosc_client_data.subscribeMode         = 0;
+			self.zoomosc_client_data.galTrackMode          = 0;
+			self.zoomosc_client_data.callStatus            = 0;
+			self.zoomosc_client_data.numberOfTargets       = 0;
+			self.zoomosc_client_data.numberOfUsersInCall   = 0;
 			self.zoomosc_client_data.numberOfSelectedUsers = 0;
 			self.status(self.STATUS_ERROR);
 			self.init_variables();
@@ -1572,95 +1576,95 @@ instance.prototype.init_presets = function () {
 		"Audio": {
 			preset_label: "Audio",
 			button_label: "\\nAudio",
-			action: 'AV_GROUP',
-			message: 'ZOSC_MSG_PART_TOGGLE_MUTE',
-			prop:'audioStatus',
-			enabled_icon: ZOSC_ICONS.MIC_ENABLED,
+			action:       'AV_GROUP',
+			message:      'ZOSC_MSG_PART_TOGGLE_MUTE',
+			prop:         'audioStatus',
+			enabled_icon:  ZOSC_ICONS.MIC_ENABLED,
 			disabled_icon: ZOSC_ICONS.MIC_DISABLED
 			},
 		"Video": {
-			preset_label: "Video",
-			button_label: "\\nVideo",
-			action: 'AV_GROUP',
-			message: 'ZOSC_MSG_PART_TOGGLE_VIDEO',
-			prop:'videoStatus',
-			enabled_icon: ZOSC_ICONS.CAMERA_ENABLED,
+			preset_label:  "Video",
+			button_label:  "\\nVideo",
+			action:        'AV_GROUP',
+			message:       'ZOSC_MSG_PART_TOGGLE_VIDEO',
+			prop:          'videoStatus',
+			enabled_icon:  ZOSC_ICONS.CAMERA_ENABLED,
 			disabled_icon: ZOSC_ICONS.CAMERA_DISABLED
 			},
 		"Spotlight": {
-			preset_label: "Spotlight",
-			button_label: "\\nSpotlight",
-			action: 'SPOTLIGHT_GROUP',
-			message: 'ZOSC_MSG_PART_TOGGLE_SPOT',
-			prop:'spotlightStatus',
-			enabled_icon: ZOSC_ICONS.SPOTLIGHT_ENABLED,
+			preset_label:  "Spotlight",
+			button_label:  "\\nSpotlight",
+			action:        'SPOTLIGHT_GROUP',
+			message:       'ZOSC_MSG_PART_TOGGLE_SPOT',
+			prop:          'spotlightStatus',
+			enabled_icon:  ZOSC_ICONS.SPOTLIGHT_ENABLED,
 			disabled_icon: ZOSC_ICONS.SPOTLIGHT_DISABLED
 			},
 		"Pin": {
-			preset_label: "Pin",
-			button_label: "\\nPin",
-			action: 'PIN_GROUP',
-			message: 'ZOSC_MSG_PART_TOGGLE_PIN',
-			prop:'videoStatus', //TODO: change to pinStatus when implemented
-			enabled_icon: ZOSC_ICONS.PIN_ENABLED,
+			preset_label:  "Pin",
+			button_label:  "\\nPin",
+			action:        'PIN_GROUP',
+			message:       'ZOSC_MSG_PART_TOGGLE_PIN',
+			prop:          'videoStatus', //TODO: change to pinStatus when implemented
+			enabled_icon:  ZOSC_ICONS.PIN_ENABLED,
 			disabled_icon: null
 			},
 		"Single Selection": {
-			preset_label: "Single Selection",
-			button_label: "",
-			action: 'SELECTION_GROUP',
-			message: 'ZOSC_MSG_PART_LIST_SINGLE_SELECTION',
-			prop:'selected',
-			enabled_icon: null,
+			preset_label:  "Single Selection",
+			button_label:  "",
+			action:        'SELECTION_GROUP',
+			message:       'ZOSC_MSG_PART_LIST_SINGLE_SELECTION',
+			prop:          'selected',
+			enabled_icon:  null,
 			disabled_icon: null
 			},
 		"Multiple Selection": {
-			preset_label: "Multi-selection",
-			button_label: "",
-			action: 'SELECTION_GROUP',
-			message: 'ZOSC_MSG_PART_LIST_TOGGLE_SELECTION',
-			prop:'selected',
-			enabled_icon: null,
+			preset_label:  "Multi-selection",
+			button_label:  "",
+			action:        'SELECTION_GROUP',
+			message:       'ZOSC_MSG_PART_LIST_TOGGLE_SELECTION',
+			prop:          'selected',
+			enabled_icon:  null,
 			disabled_icon: null
 			},
 		"Select Favorites": {
-			preset_label: "Select Favorites",
-			button_label: "\\nFavorite",
-			action: 'FAVORITE_GROUP',
-			message: 'ZOSC_MSG_PART_LIST_TOGGLE_FAVORITE',
-			prop:'favorite',
-			enabled_icon: ZOSC_ICONS.FAVORITE_ENABLED,
+			preset_label:  "Select Favorites",
+			button_label:  "\\nFavorite",
+			action:        'FAVORITE_GROUP',
+			message:       'ZOSC_MSG_PART_LIST_TOGGLE_FAVORITE',
+			prop:          'favorite',
+			enabled_icon:  ZOSC_ICONS.FAVORITE_ENABLED,
 			disabled_icon: ZOSC_ICONS.FAVORITE_DISABLED
 			},
 		"ZoomISO Output": {
-			preset_label: "ZoomISO Outputs",
-			button_label: "",
-			action: 'ISO_ACTION_GROUP',
-			message: 'ZOSC_MSG_OUTPUT_ISO',
-			prop:'videoStatus', //TODO: change to isoStatus when implemented
-			enabled_icon: null,
+			preset_label:  "ZoomISO Outputs",
+			button_label:  "",
+			action:        'ISO_ACTION_GROUP',
+			message:       'ZOSC_MSG_OUTPUT_ISO',
+			prop:          'videoStatus', //TODO: change to isoStatus when implemented
+			enabled_icon:  null,
 			disabled_icon: null
 			},
 		};
 
 	var preset_target_types = {
 			"Gallery" : {
-				preset_label: "Gallery Position (macOS only)",
+				preset_label:    "Gallery Position (macOS only)",
 				getButtonNumber: function (x, y) {return x+","+y;},
-				var_string: "galPos",
-				user_string: "galleryPosition"
+				var_string:      "galPos",
+				user_string:     "galleryPosition"
 			},
 			"ListIndex" : {
-				preset_label: "List Index",
+				preset_label:    "List Index",
 				getButtonNumber: function (x, y) {return (x*7)+y;},
-				var_string: "listIndex",
-				user_string: "listIndex"
+				var_string:      "listIndex",
+				user_string:     "listIndex"
 			},
 			"TargetID" : {
-				preset_label: "Target ID",
+				preset_label:    "Target ID",
 				getButtonNumber: function (x, y) {return (x*7)+y;},
-				var_string: "tgtID",
-				user_string: "targetID"
+				var_string:      "tgtID",
+				user_string:     "targetID"
 			},
 		};
 	
@@ -1679,30 +1683,30 @@ for(const [targetType_short, targetType] of Object.entries(preset_target_types))
 			for(let y=0;y<7;y++){
 				presets.push({
 					category: preset_action.preset_label+" by "+targetType.preset_label,
-					label: preset_action.preset_label+" by "+targetType.preset_label+" ("+targetType.getButtonNumber(x,y)+")",
+					label:    preset_action.preset_label+" by "+targetType.preset_label+" ("+targetType.getButtonNumber(x,y)+")",
 					bank: {
-						style: 'text',
-						text: '$('+self.config.label+':userName_'+targetType.var_string+'_'+
-							  targetType.getButtonNumber(x,y)+')'+preset_action.button_label,
-						size: 'Auto',
-						color: self.rgb(255,255,255),
+						style:   'text',
+						text:    '$('+self.config.label+':userName_'+targetType.var_string+'_'+
+							       targetType.getButtonNumber(x,y)+')'+preset_action.button_label,
+						size:    'Auto',
+						color:   self.rgb(255,255,255),
 						bgcolor: self.rgb(0,0,0)
 					},
 					actions: [{
 						action: preset_action.action,
 						options: {
-							message: preset_action.message,
-							user: targetType.user_string,
-							userString:targetType.getButtonNumber(x,y)
+							message:    preset_action.message,
+							user:       targetType.user_string,
+							userString: targetType.getButtonNumber(x,y)
 						}
 					}],
 					feedbacks:[{
 						type:'user_status_fb',
 						options:{
-							user:targetType.user_string,
-							userString:targetType.getButtonNumber(x,y),
-							prop:preset_action.prop,
-							propertyValue:1,
+							user:          targetType.user_string,
+							userString:    targetType.getButtonNumber(x,y),
+							prop:          preset_action.prop,
+							propertyValue: 1,
 						},
 						style:{
 							bgcolor: self.rgb(0,100,0)
@@ -1712,13 +1716,13 @@ for(const [targetType_short, targetType] of Object.entries(preset_target_types))
 					{
 						type:'user_status_fb',
 						options:{
-							user:targetType.user_string,
-							userString:targetType.getButtonNumber(x,y),
-							prop:preset_action.prop,
-							propertyValue:0,
+							user:          targetType.user_string,
+							userString:    targetType.getButtonNumber(x,y),
+							prop:          preset_action.prop,
+							propertyValue: 0,
 						},
 						style:{
-							bgcolor:self.rgb(100,0,0)
+							bgcolor: self.rgb(100,0,0)
 						}
 
 					}
@@ -1739,12 +1743,12 @@ for(const [targetType_short, targetType] of Object.entries(preset_target_types))
 				for(const [config_key, config_value] of (Object.entries(local_preset.config).filter(e => Object.keys(e[1]).length !== 0))) {
 					//config_value.text = config_value.text.replaceAll("$(zoomosc", "$("+self.config.label);
 					presets.push({
-						category: preset_action.preset_label+" by "+targetType.preset_label,
-						label: config_value.text,
-						bank: config_value,
-						actions: remove_instance_identifiers(local_preset.actions[config_key]),
+						category:        preset_action.preset_label+" by "+targetType.preset_label,
+						label:           config_value.text,
+						bank:            config_value,
+						actions:         remove_instance_identifiers(local_preset.actions[config_key]),
 						release_actions: remove_instance_identifiers(local_preset.release_actions[config_key]),
-						feedbacks: remove_instance_identifiers(local_preset.feedbacks[config_key]),
+						feedbacks:       remove_instance_identifiers(local_preset.feedbacks[config_key]),
 					});
 				}
 			}
@@ -1758,12 +1762,12 @@ fs.readdirSync(path.resolve(__dirname,'presets/')).forEach(file => {
 		for(const [config_key, config_value] of (Object.entries(local_preset.config).filter(e => Object.keys(e[1]).length !== 0))) {
 			//config_value.text = config_value.text.replaceAll("$(zoomosc", "$("+self.config.label);
 			presets.push({
-				category: local_preset.page.name,
-				label: config_value.text,
-				bank: config_value,
-				actions: remove_instance_identifiers(local_preset.actions[config_key]),
+				category:        local_preset.page.name,
+				label:           config_value.text,
+				bank:            config_value,
+				actions:         remove_instance_identifiers(local_preset.actions[config_key]),
 				release_actions: remove_instance_identifiers(local_preset.release_actions[config_key]),
-				feedbacks: remove_instance_identifiers(local_preset.feedbacks[config_key]),
+				feedbacks:       remove_instance_identifiers(local_preset.feedbacks[config_key]),
 			});
 		}
 	}
